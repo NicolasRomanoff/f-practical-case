@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 const Catalog = () => {
   const [catalog, setCatalog] = useState([]);
+  const [filteredCatalog, setFilteredCatalog] = useState([]);
   const [catalogSearch, setCatalogSearch] = useState("");
   const [loadingCatalog, setLoadingCatalog] = useState(false);
 
@@ -9,11 +10,29 @@ const Catalog = () => {
     fetchCatalog();
   }, []);
 
+  useEffect(() => {
+    let nextCatalog = [...catalog];
+
+    if (catalogSearch.trim()) {
+      const normalized = catalogSearch.toLowerCase();
+      nextCatalog = nextCatalog.filter((device) => {
+        return (
+          String(device.name || "")
+            .toLowerCase()
+            .includes(normalized) ||
+          String(device.configuration || "")
+            .toLowerCase()
+            .includes(normalized)
+        );
+      });
+    }
+    setFilteredCatalog(nextCatalog);
+  }, [catalog, catalogSearch]);
+
   const handleAddToCart = (productId) => {};
 
   const fetchCatalog = async () => {
     setLoadingCatalog(true);
-    // setErrors([]);
     try {
       const response = await fetch("/api/products");
       const json = await response.json();
@@ -21,12 +40,8 @@ const Catalog = () => {
         throw new Error(json.message || "Could not load products");
       }
       setCatalog(Array.isArray(json) ? json : []);
-      // setLastRefreshAt(new Date().toISOString());
     } catch (error) {
-      // setErrors((prev) => [
-      //   ...prev,
-      //   `Catalog fetch failed: ${error.message}`,
-      // ]);
+      console.error(error);
     }
     setLoadingCatalog(false);
   };
@@ -40,25 +55,30 @@ const Catalog = () => {
           <input
             value={catalogSearch}
             onChange={(event) => setCatalogSearch(event.target.value)}
-            placeholder="Search name"
+            placeholder="Search name / configuration"
           />
         </label>
       </div>
-
       <h3>Catalog list {loadingCatalog ? "(loading...)" : ""}</h3>
       <table>
         <thead>
           <tr>
             <th>Name</th>
-            <th>Base Price</th>
+            <th>Configuration</th>
+            <th>Status</th>
+            <th>Stock</th>
+            <th>Price</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {catalog.map((product) => (
+          {filteredCatalog.map((product) => (
             <tr key={product.id}>
               <td>{product.name}</td>
-              <td>{product.base_price}</td>
+              <td>{product.configuration}</td>
+              <td>{product.status}</td>
+              <td>{product.stock}</td>
+              <td>{product.price}</td>
               <td>
                 <button
                   type="button"
@@ -69,7 +89,7 @@ const Catalog = () => {
               </td>
             </tr>
           ))}
-          {catalog.length === 0 ? (
+          {filteredCatalog.length === 0 ? (
             <tr>
               <td colSpan="4">No product found</td>
             </tr>
