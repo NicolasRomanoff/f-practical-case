@@ -1,6 +1,10 @@
 import cors from "cors";
 import express from "express";
-import { devicesRouter, employeesRouter } from "./src/routes/index.js";
+import {
+  devicesRouter,
+  employeesRouter,
+  productsRouter,
+} from "./src/routes/index.js";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -16,6 +20,7 @@ const apiRouter = express.Router();
 
 apiRouter.use("/employees", employeesRouter);
 apiRouter.use("/devices", devicesRouter);
+apiRouter.use("/products", productsRouter);
 
 app.use("/api", apiRouter);
 
