@@ -1,22 +1,13 @@
-const express = require("express");
-const cors = require("cors");
-const path = require("path");
-const sqlite3 = require("sqlite3").verbose();
+import cors from "cors";
+import express from "express";
+import { catalogRouter } from "./src/routes/index.js";
+import { db } from "./src/sqlite.js";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
-
-const dbPath = path.join(__dirname, "fleet.sqlite");
-const db = new sqlite3.Database(dbPath, (err) => {
-  if (err) {
-    console.error("Could not open sqlite database", err);
-  } else {
-    console.log("Connected to sqlite database at", dbPath);
-  }
-});
 
 db.serialize(() => {
   db.run(`
@@ -443,6 +434,8 @@ app.delete("/api/devices/:id", (req, res) => {
     },
   );
 });
+
+app.use("/api/catalog", catalogRouter);
 
 app.listen(PORT, () => {
   console.log(`API running on http://localhost:${PORT}`);
