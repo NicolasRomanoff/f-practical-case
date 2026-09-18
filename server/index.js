@@ -3,6 +3,7 @@ import express from "express";
 import {
   devicesRouter,
   employeesRouter,
+  ordersRouter,
   productsRouter,
 } from "./src/routes/index.js";
 
@@ -21,6 +22,7 @@ const apiRouter = express.Router();
 apiRouter.use("/employees", employeesRouter);
 apiRouter.use("/devices", devicesRouter);
 apiRouter.use("/products", productsRouter);
+apiRouter.use("/orders", ordersRouter);
 
 app.use("/api", apiRouter);
 

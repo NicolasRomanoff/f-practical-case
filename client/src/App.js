@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 import Catalog from "./components/Catalog";
+import Order from "./components/Order";
 
 const DEFAULT_EMPLOYEE_FORM = { name: "", role: "" };
 const DEFAULT_DEVICE_FORM = { name: "", type: "Laptop", ownerId: "" };
@@ -74,12 +75,18 @@ function App() {
       setDeviceOwnerFilter(savedOwnerFilter);
     }
 
-    if (hash === "employees" || hash === "devices" || hash === "catalog") {
+    if (
+      hash === "employees" ||
+      hash === "devices" ||
+      hash === "catalog" ||
+      hash === "order"
+    ) {
       setActiveTab(hash);
     } else if (
       savedTab === "employees" ||
       savedTab === "devices" ||
-      savedTab === "catalog"
+      savedTab === "catalog" ||
+      savedTab === "order"
     ) {
       setActiveTab(savedTab);
     }
@@ -476,6 +483,13 @@ function App() {
           Catalog
         </button>
         <button
+          className={activeTab === "order" ? "tab-button active" : "tab-button"}
+          onClick={() => setActiveTab("order")}
+          type="button"
+        >
+          Order
+        </button>
+        <button
           type="button"
           onClick={() => {
             fetchEmployees();
@@ -773,6 +787,7 @@ function App() {
           </section>
         ) : null}
         {activeTab === "catalog" ? <Catalog /> : null}
+        {activeTab === "order" ? <Order /> : null}
       </main>
     </div>
   );

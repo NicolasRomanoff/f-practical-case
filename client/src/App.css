@@ -1,4 +1,6 @@
 .app-page {
+  position: relative;
+  min-height: 100dvh;
   max-width: 1100px;
   margin: 0 auto;
   padding: 16px;
@@ -196,6 +198,24 @@ th {
   border: 1px solid #d4dde8;
   border-radius: 4px;
   padding: 8px;
+}
+
+dialog {
+  position: absolute;
+  inset: 0;
+  background-color: #d4dde8;
+  margin: auto;
+  min-width: fit-content;
+  width: 40vw;
+  height: 50vh;
+  border: 1px solid #24323f;
+  border-radius: 4px;
+  padding: 8px;
+}
+
+.dialog-close {
+  display: flex;
+  flex-direction: row-reverse;
 }
 
 @media (max-width: 800px) {
