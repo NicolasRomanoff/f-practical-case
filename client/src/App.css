@@ -163,22 +163,39 @@ th {
 .sidebar {
   position: fixed;
   display: grid;
-  grid-template-rows: 1fr 5fr 1fr;
+  grid-template-rows: 0fr 1fr;
   right: 0;
   top: 0;
   width: 15%;
   height: 100%;
+  padding-left: 8px;
+  padding-right: 8px;
+  border: 1px solid #d4dde8;
 }
 
-.addOrDelete {
-  display: flex;
-  justify-content: space-evenly;
+.sidebar-actions {
+  padding-bottom: 8px;
 }
 
 .cart {
-  display: flex;
-  flex-direction: column;
   overflow-y: scroll;
+  border-top: 1px solid #d4dde8;
+  border-bottom: 1px solid #d4dde8;
+}
+
+.cart-element {
+  border: 1px solid #d4dde8;
+  border-radius: 4px;
+  margin: 8px;
+  padding: 8px;
+}
+
+.cart-actions {
+  display: flex;
+  justify-content: space-evenly;
+  border: 1px solid #d4dde8;
+  border-radius: 4px;
+  padding: 8px;
 }
 
 @media (max-width: 800px) {
