@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { useCart } from "./contexts/cart/cart.context";
 
 const Catalog = () => {
+  const { addToCart } = useCart();
   const [catalog, setCatalog] = useState([]);
   const [filteredCatalog, setFilteredCatalog] = useState([]);
   const [catalogSearch, setCatalogSearch] = useState("");
@@ -28,8 +30,6 @@ const Catalog = () => {
     }
     setFilteredCatalog(nextCatalog);
   }, [catalog, catalogSearch]);
-
-  const handleAddToCart = (productId) => {};
 
   const fetchCatalog = async () => {
     setLoadingCatalog(true);
@@ -73,17 +73,14 @@ const Catalog = () => {
         </thead>
         <tbody>
           {filteredCatalog.map((product) => (
-            <tr key={product.id}>
+            <tr key={product.product_variants_id}>
               <td>{product.name}</td>
               <td>{product.configuration}</td>
               <td>{product.status}</td>
               <td>{product.stock}</td>
               <td>{product.price}</td>
               <td>
-                <button
-                  type="button"
-                  onClick={() => handleAddToCart(product.id)}
-                >
+                <button type="button" onClick={() => addToCart(product)}>
                   Add to Cart
                 </button>
               </td>

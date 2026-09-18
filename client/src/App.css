@@ -160,6 +160,27 @@ th {
   background: #eef3fa;
 }
 
+.sidebar {
+  position: fixed;
+  display: grid;
+  grid-template-rows: 1fr 5fr 1fr;
+  right: 0;
+  top: 0;
+  width: 15%;
+  height: 100%;
+}
+
+.addOrDelete {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.cart {
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+}
+
 @media (max-width: 800px) {
   .app-kpis,
   .app-form,
