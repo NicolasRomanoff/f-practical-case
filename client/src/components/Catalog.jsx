@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import CartSidebar from "./CartSidebar";
 import { useCart } from "./contexts/cart/cart.context";
 
 const Catalog = () => {
@@ -47,53 +48,56 @@ const Catalog = () => {
   };
 
   return (
-    <section className="panel">
-      <h3>Filters</h3>
-      <div className="filters">
-        <label>
-          Search
-          <input
-            value={catalogSearch}
-            onChange={(event) => setCatalogSearch(event.target.value)}
-            placeholder="Search name / configuration"
-          />
-        </label>
-      </div>
-      <h3>Catalog list {loadingCatalog ? "(loading...)" : ""}</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Configuration</th>
-            <th>Status</th>
-            <th>Stock</th>
-            <th>Price</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredCatalog.map((product) => (
-            <tr key={product.product_variants_id}>
-              <td>{product.name}</td>
-              <td>{product.configuration}</td>
-              <td>{product.status}</td>
-              <td>{product.stock}</td>
-              <td>{product.price} €</td>
-              <td>
-                <button type="button" onClick={() => addToCart(product)}>
-                  Add to Cart
-                </button>
-              </td>
-            </tr>
-          ))}
-          {filteredCatalog.length === 0 ? (
+    <>
+      <CartSidebar />
+      <section className="panel">
+        <h3>Filters</h3>
+        <div className="filters">
+          <label>
+            Search
+            <input
+              value={catalogSearch}
+              onChange={(event) => setCatalogSearch(event.target.value)}
+              placeholder="Search name / configuration"
+            />
+          </label>
+        </div>
+        <h3>Catalog list {loadingCatalog ? "(loading...)" : ""}</h3>
+        <table>
+          <thead>
             <tr>
-              <td colSpan="6">No product found</td>
+              <th>Name</th>
+              <th>Configuration</th>
+              <th>Status</th>
+              <th>Stock</th>
+              <th>Price</th>
+              <th>Actions</th>
             </tr>
-          ) : null}
-        </tbody>
-      </table>
-    </section>
+          </thead>
+          <tbody>
+            {filteredCatalog.map((product) => (
+              <tr key={product.product_variants_id}>
+                <td>{product.name}</td>
+                <td>{product.configuration}</td>
+                <td>{product.status}</td>
+                <td>{product.stock}</td>
+                <td>{product.price} €</td>
+                <td>
+                  <button type="button" onClick={() => addToCart(product)}>
+                    Add to Cart
+                  </button>
+                </td>
+              </tr>
+            ))}
+            {filteredCatalog.length === 0 ? (
+              <tr>
+                <td colSpan="6">No product found</td>
+              </tr>
+            ) : null}
+          </tbody>
+        </table>
+      </section>
+    </>
   );
 };
 

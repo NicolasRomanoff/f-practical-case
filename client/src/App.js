@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 import Catalog from "./components/Catalog";
 import Order from "./components/Order";
+import { CartProvider } from "./components/contexts/cart/cart.provider";
 
 const DEFAULT_EMPLOYEE_FORM = { name: "", role: "" };
 const DEFAULT_DEVICE_FORM = { name: "", type: "Laptop", ownerId: "" };
@@ -786,7 +787,11 @@ function App() {
             </table>
           </section>
         ) : null}
-        {activeTab === "catalog" ? <Catalog /> : null}
+        {activeTab === "catalog" ? (
+          <CartProvider>
+            <Catalog />
+          </CartProvider>
+        ) : null}
         {activeTab === "order" ? <Order /> : null}
       </main>
     </div>
