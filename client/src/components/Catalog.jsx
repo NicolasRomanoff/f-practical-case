@@ -17,12 +17,12 @@ const Catalog = () => {
 
     if (catalogSearch.trim()) {
       const normalized = catalogSearch.toLowerCase();
-      nextCatalog = nextCatalog.filter((device) => {
+      nextCatalog = nextCatalog.filter((product) => {
         return (
-          String(device.name || "")
+          String(product.name || "")
             .toLowerCase()
             .includes(normalized) ||
-          String(device.configuration || "")
+          String(product.configuration || "")
             .toLowerCase()
             .includes(normalized)
         );
@@ -78,7 +78,7 @@ const Catalog = () => {
               <td>{product.configuration}</td>
               <td>{product.status}</td>
               <td>{product.stock}</td>
-              <td>{product.price}</td>
+              <td>{product.price} €</td>
               <td>
                 <button type="button" onClick={() => addToCart(product)}>
                   Add to Cart
@@ -88,7 +88,7 @@ const Catalog = () => {
           ))}
           {filteredCatalog.length === 0 ? (
             <tr>
-              <td colSpan="4">No product found</td>
+              <td colSpan="6">No product found</td>
             </tr>
           ) : null}
         </tbody>
