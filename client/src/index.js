@@ -1,18 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
-import CartSidebar from "./components/CartSidebar";
-import { CartProvider } from "./components/contexts/cart/cart.provider";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <CartProvider>
-      <App />
-      <CartSidebar />
-    </CartProvider>
+    <App />
   </React.StrictMode>,
 );
 

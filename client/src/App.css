@@ -168,11 +168,13 @@ th {
   grid-template-rows: 0fr 1fr;
   right: 0;
   top: 0;
-  width: 15%;
-  height: 100%;
   padding-left: 8px;
   padding-right: 8px;
   border: 1px solid #d4dde8;
+  background-color: #ffffff;
+  min-width: fit-content;
+  height: 100%;
+  width: 40vh;
 }
 
 .sidebar-actions {
