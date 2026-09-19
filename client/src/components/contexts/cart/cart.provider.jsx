@@ -11,13 +11,13 @@ export const CartProvider = ({ children }) => {
       if (!prev.length) return [{ product: newProduct, quantity: 1 }];
 
       const productFind = prev.find(({ product }) => {
-        return product.product_variants_id === newProduct.product_variants_id;
+        return product.product_variant_id === newProduct.product_variant_id;
       });
       if (!productFind) return [...prev, { product: newProduct, quantity: 1 }];
       if (productFind.product.stock <= productFind.quantity) return prev;
 
       return prev.map(({ product, quantity }) => {
-        if (product.product_variants_id !== newProduct.product_variants_id) {
+        if (product.product_variant_id !== newProduct.product_variant_id) {
           return { product, quantity };
         }
         return { product, quantity: quantity + 1 };
@@ -29,7 +29,7 @@ export const CartProvider = ({ children }) => {
     setCart((prev) => {
       return prev
         .map(({ product, quantity }) => {
-          if (product.product_variants_id !== newProduct.product_variants_id) {
+          if (product.product_variant_id !== newProduct.product_variant_id) {
             return { product, quantity };
           }
           if (!(quantity - 1)) return null;
@@ -44,7 +44,7 @@ export const CartProvider = ({ children }) => {
     setCart((prev) => {
       return prev
         .map(({ product, quantity }) => {
-          if (product.product_variants_id !== newProduct.product_variants_id) {
+          if (product.product_variant_id !== newProduct.product_variant_id) {
             return { product, quantity };
           }
           return null;

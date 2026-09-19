@@ -12,10 +12,17 @@ const CartSidebar = () => {
 
   const handleOrder = async (cart) => {
     try {
+      const products = cart.map(({ product, quantity }) => {
+        return {
+          product_id: product.product_id,
+          product_variant_id: product.product_variant_id,
+          quantity,
+        };
+      });
       const response = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: { cart },
+        body: JSON.stringify({ cart: products }),
       });
       const json = await response.json();
       if (!response.ok) {
@@ -32,7 +39,7 @@ const CartSidebar = () => {
       <div className="cart">
         {cart.map(({ product, quantity }) => {
           return (
-            <div key={product.product_variants_id} className="cart-element">
+            <div key={product.product_variant_id} className="cart-element">
               <h3>{product.name}</h3>
               <p>{product.configuration}</p>
               <div className="cart-actions">

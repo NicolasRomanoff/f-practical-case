@@ -76,7 +76,7 @@ const Catalog = () => {
           </thead>
           <tbody>
             {filteredCatalog.map((product) => (
-              <tr key={product.product_variants_id}>
+              <tr key={product.product_variant_id}>
                 <td>{product.name}</td>
                 <td>{product.configuration}</td>
                 <td>{product.status}</td>
