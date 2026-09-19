@@ -10,7 +10,21 @@ const CartSidebar = () => {
     totalPrice,
   } = useCart();
 
-  const handleOrder = (cart) => {};
+  const handleOrder = async (cart) => {
+    try {
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: { cart },
+      });
+      const json = await response.json();
+      if (!response.ok) {
+        throw new Error(json.message || "Could not order");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="sidebar">
