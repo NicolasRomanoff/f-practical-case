@@ -1,5 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import "./App.css";
+import Catalog from "./components/Catalog";
+import Order from "./components/Order";
+import { CartProvider } from "./components/contexts/cart/cart.provider";
+import { CatalogProvider } from "./components/contexts/catalog/catalog.provider";
 
 const DEFAULT_EMPLOYEE_FORM = { name: "", role: "" };
 const DEFAULT_DEVICE_FORM = { name: "", type: "Laptop", ownerId: "" };
@@ -73,9 +77,19 @@ function App() {
       setDeviceOwnerFilter(savedOwnerFilter);
     }
 
-    if (hash === "employees" || hash === "devices") {
+    if (
+      hash === "employees" ||
+      hash === "devices" ||
+      hash === "catalog" ||
+      hash === "order"
+    ) {
       setActiveTab(hash);
-    } else if (savedTab === "employees" || savedTab === "devices") {
+    } else if (
+      savedTab === "employees" ||
+      savedTab === "devices" ||
+      savedTab === "catalog" ||
+      savedTab === "order"
+    ) {
       setActiveTab(savedTab);
     }
   }, []);
@@ -462,6 +476,22 @@ function App() {
           Devices
         </button>
         <button
+          className={
+            activeTab === "catalog" ? "tab-button active" : "tab-button"
+          }
+          onClick={() => setActiveTab("catalog")}
+          type="button"
+        >
+          Catalog
+        </button>
+        <button
+          className={activeTab === "order" ? "tab-button active" : "tab-button"}
+          onClick={() => setActiveTab("order")}
+          type="button"
+        >
+          Order
+        </button>
+        <button
           type="button"
           onClick={() => {
             fetchEmployees();
@@ -758,6 +788,14 @@ function App() {
             </table>
           </section>
         ) : null}
+        {activeTab === "catalog" ? (
+          <CatalogProvider>
+            <CartProvider>
+              <Catalog />
+            </CartProvider>
+          </CatalogProvider>
+        ) : null}
+        {activeTab === "order" ? <Order /> : null}
       </main>
     </div>
   );
