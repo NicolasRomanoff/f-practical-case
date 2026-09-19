@@ -3,6 +3,7 @@ import "./App.css";
 import Catalog from "./components/Catalog";
 import Order from "./components/Order";
 import { CartProvider } from "./components/contexts/cart/cart.provider";
+import { CatalogProvider } from "./components/contexts/catalog/catalog.provider";
 
 const DEFAULT_EMPLOYEE_FORM = { name: "", role: "" };
 const DEFAULT_DEVICE_FORM = { name: "", type: "Laptop", ownerId: "" };
@@ -788,9 +789,11 @@ function App() {
           </section>
         ) : null}
         {activeTab === "catalog" ? (
-          <CartProvider>
-            <Catalog />
-          </CartProvider>
+          <CatalogProvider>
+            <CartProvider>
+              <Catalog />
+            </CartProvider>
+          </CatalogProvider>
         ) : null}
         {activeTab === "order" ? <Order /> : null}
       </main>

@@ -1,17 +1,13 @@
 import { useEffect, useState } from "react";
 import CartSidebar from "./CartSidebar";
 import { useCart } from "./contexts/cart/cart.context";
+import { useCatalog } from "./contexts/catalog/catalog.context";
 
 const Catalog = () => {
+  const { catalog, isLoading } = useCatalog();
   const { addToCart } = useCart();
-  const [catalog, setCatalog] = useState([]);
   const [filteredCatalog, setFilteredCatalog] = useState([]);
   const [catalogSearch, setCatalogSearch] = useState("");
-  const [loadingCatalog, setLoadingCatalog] = useState(false);
-
-  useEffect(() => {
-    fetchCatalog();
-  }, []);
 
   useEffect(() => {
     let nextCatalog = [...catalog];
@@ -32,21 +28,6 @@ const Catalog = () => {
     setFilteredCatalog(nextCatalog);
   }, [catalog, catalogSearch]);
 
-  const fetchCatalog = async () => {
-    setLoadingCatalog(true);
-    try {
-      const response = await fetch("/api/products");
-      const json = await response.json();
-      if (!response.ok) {
-        throw new Error(json.message || "Could not load products");
-      }
-      setCatalog(Array.isArray(json) ? json : []);
-    } catch (error) {
-      console.error(error);
-    }
-    setLoadingCatalog(false);
-  };
-
   return (
     <>
       <CartSidebar />
@@ -62,7 +43,7 @@ const Catalog = () => {
             />
           </label>
         </div>
-        <h3>Catalog list {loadingCatalog ? "(loading...)" : ""}</h3>
+        <h3>Catalog list {isLoading ? "(loading...)" : ""}</h3>
         <table>
           <thead>
             <tr>
@@ -83,7 +64,11 @@ const Catalog = () => {
                 <td>{product.stock}</td>
                 <td>{product.price} €</td>
                 <td>
-                  <button type="button" onClick={() => addToCart(product)}>
+                  <button
+                    disabled={!product.stock}
+                    type="button"
+                    onClick={() => addToCart(product)}
+                  >
                     Add to Cart
                   </button>
                 </td>
