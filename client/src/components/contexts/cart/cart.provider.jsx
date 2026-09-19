@@ -4,6 +4,14 @@ import { CartContext } from "./cart.context";
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
 
+  const totalPrice = useMemo(() => {
+    const initialValue = 0;
+    return cart.reduce(
+      (price, { product, quantity }) => price + product.price * quantity,
+      initialValue,
+    );
+  }, [cart]);
+
   const addToCart = (newProduct) => {
     if (!newProduct.stock) return;
 
@@ -54,14 +62,6 @@ export const CartProvider = ({ children }) => {
   };
 
   const deleteCart = () => setCart([]);
-
-  const totalPrice = useMemo(() => {
-    const initialValue = 0;
-    return cart.reduce(
-      (price, { product, quantity }) => price + product.price * quantity,
-      initialValue,
-    );
-  }, [cart]);
 
   return (
     <CartContext.Provider

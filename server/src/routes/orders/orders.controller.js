@@ -73,8 +73,8 @@ export const postOrder = (req, res) => {
     });
   }
 
-  const getStockValues = parsedCart.data.map(() => "(?, ?, ?)").join(", ");
-  const getStockParams = parsedCart.data.flatMap((product) => [
+  const values = parsedCart.data.map(() => "(?, ?, ?)").join(", ");
+  const params = parsedCart.data.flatMap((product) => [
     product.product_id,
     product.product_variant_id,
     product.quantity,
@@ -87,16 +87,16 @@ export const postOrder = (req, res) => {
       cart.column3 AS quantity,
       cart.column2 AS product_variant_id
     FROM (
-      VALUES ${getStockValues}
+      VALUES ${values}
     ) AS cart
     JOIN products AS p
-      ON p.id == cart.column1
+      ON p.id = cart.column1
     JOIN product_variants AS pv
-      ON pv.id == cart.column2
+      ON pv.id = cart.column2
     WHERE pv.stock < cart.column3
     LIMIT 1
     `,
-    getStockParams,
+    params,
     (err, row) => {
       if (err) {
         return res.status(500).json({
@@ -113,104 +113,126 @@ export const postOrder = (req, res) => {
     },
   );
 
-  return res.status(200).json({
-    message: "Sufficient stock",
+  db.serialize(() => {
+    db.run("BEGIN", (err) => {
+      if (err) {
+        return res.status(500).json({
+          message: "Failed to begin order",
+          detail: err.message,
+        });
+      }
+    });
+
+    db.run(
+      `
+      INSERT INTO orders (
+        total_amount,
+        item_count
+      )
+      SELECT
+        SUM((p.base_price + pv.price_delta) * cart.column3),
+        SUM(cart.column3)
+      FROM (
+        VALUES ${values}
+      ) AS cart
+      JOIN products AS p
+        ON p.id = cart.column1
+      JOIN product_variants AS pv
+        ON pv.id = cart.column2
+      `,
+      params,
+      function onInsert(err) {
+        if (err) {
+          db.run("ROLLBACK");
+          return res.status(500).json({
+            message: "Failed to create order",
+            detail: err.message,
+          });
+        }
+        const orderId = this.lastID;
+
+        db.run(
+          `
+          INSERT INTO order_items (
+            order_id,
+            product_id,
+            product_variant_id,
+            product_name,
+            configuration,
+            sku,
+            unit_price,
+            quantity,
+            line_total
+          )
+          SELECT
+            ?,
+            p.id,
+            pv.id,
+            p.name,
+            pv.configuration,
+            pv.sku,
+            p.base_price + pv.price_delta,
+            cart.column3,
+            (p.base_price + pv.price_delta) * cart.column3
+          FROM (
+            VALUES ${values}
+          ) AS cart
+          JOIN products AS p
+            ON p.id == cart.column1
+          JOIN product_variants AS pv
+            ON pv.id == cart.column2
+            AND pv.product_id == p.id
+          `,
+          [orderId, ...params],
+          (err) => {
+            if (err) {
+              db.run("ROLLBACK");
+              return res.status(500).json({
+                message: `Failed to insert products of order ${orderId}`,
+                detail: err.message,
+              });
+            }
+          },
+
+          db.run(
+            `
+            UPDATE product_variants AS pv
+              SET stock = stock - cart.column3
+            FROM (
+              VALUES ${values}
+            ) AS cart
+            JOIN products AS p
+              ON p.id = cart.column1
+            WHERE p.id = cart.column1
+              AND pv.id = cart.column2
+            `,
+            params,
+            (err) => {
+              if (err) {
+                db.run("ROLLBACK");
+                return res.status(500).json({
+                  message: "Failed to change stock after order",
+                  detail: err.message,
+                });
+              }
+
+              db.run("COMMIT", (err) => {
+                if (err) {
+                  db.run("ROLLBACK");
+                  return res.status(500).json({
+                    message: "Failed to create order",
+                    detail: err.message,
+                  });
+                }
+                return res.status(201).json({
+                  message: "Order created",
+                  orderId,
+                });
+              });
+            },
+          ),
+        );
+      },
+    );
   });
-
-  // db.serialize(() => {
-  //   db.run("BEGIN", (err) => {
-  //     if (err) {
-  //       return res.status(500).json({
-  //         message: "Failed to begin order",
-  //         detail: err.message,
-  //       });
-  //     }
-  //   });
-
-  //   db.run(
-  //     `
-  //     INSERT INTO orders (total_amount, item_count)
-  //     VALUES (?, ?)
-  //     `,
-  //     [order.total_amount, order.item_count],
-  //     function onInsert(err) {
-  //       if (err) {
-  //         db.run("ROLLBACK");
-  //         return res.status(500).json({
-  //           message: "Failed to create order",
-  //           detail: err.message,
-  //         });
-  //       }
-  //       const orderId = this.lastID;
-  //       const values = cart.data.map(() => "(?, ?, ?)").join(", ");
-  //       const params = cart.data.flatMap(({ product, quantity }) => [
-  //         product.product_id,
-  //         product.product_variants_id,
-  //         quantity,
-  //       ]);
-
-  //       db.run(
-  //         `
-  //       INSERT INTO order_items (
-  //         order_id,
-  //         product_id,
-  //         product_variant_id,
-  //         product_name,
-  //         configuration,
-  //         sku,
-  //         unit_price,
-  //         quantity,
-  //         line_total
-  //         )
-  //         SELECT
-  //         ?,
-  //         p.id,
-  //         pv.id,
-  //         p.name,
-  //         pv.configuration,
-  //         pv.sku,
-  //         p.base_price + pv.price_delta,
-  //         cart.quantity,
-  //         (p.base_price + pv.price_delta) * cart.quantity
-  //         FROM (
-  //           VALUES ${values}
-  //           ) AS cart(
-  //             product_id,
-  //             product_variant_id,
-  //             quantity
-  //             )
-  //             JOIN products AS p
-  //             ON p.id == cart.product_id
-  //             JOIN product_variants AS pv
-  //             ON pv.id == cart.product_variant_id
-  //             AND pv.product_id == p.id
-  //             `,
-  //         [orderId, ...params],
-  //         (err) => {
-  //           if (err) {
-  //             db.run("ROLLBACK");
-  //             return res.status(500).json({
-  //               message: `Failed to insert products of order ${orderId}`,
-  //               detail: err.message,
-  //             });
-  //           }
-
-  //           db.run("COMMIT", (err) => {
-  //             if (err) {
-  //               db.run("ROLLBACK");
-  //               return res.status(500).json({
-  //                 message: "Failed to create order",
-  //                 detail: err.message,
-  //               });
-  //             }
-  //             return res.status(201).json({
-  //               message: "Order created",
-  //               orderId,
-  //             });
-  //           });
-  //         },
-  //       );
-  //     },
-  //   );
-  // });
 };

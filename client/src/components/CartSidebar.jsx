@@ -1,6 +1,8 @@
 import { useCart } from "./contexts/cart/cart.context";
+import { useCatalog } from "./contexts/catalog/catalog.context";
 
 const CartSidebar = () => {
+  const { refetch } = useCatalog();
   const {
     cart,
     addToCart,
@@ -11,6 +13,8 @@ const CartSidebar = () => {
   } = useCart();
 
   const handleOrder = async (cart) => {
+    if (!cart.length) return;
+
     try {
       const products = cart.map(({ product, quantity }) => {
         return {
@@ -28,6 +32,8 @@ const CartSidebar = () => {
       if (!response.ok) {
         throw new Error(json.message || "Could not order");
       }
+      deleteCart();
+      refetch();
     } catch (error) {
       console.error(error);
     }
@@ -45,7 +51,12 @@ const CartSidebar = () => {
               <div className="cart-actions">
                 <button onClick={() => deleteOneFromCart(product)}>-</button>
                 <p>{quantity}</p>
-                <button onClick={() => addToCart(product)}>+</button>
+                <button
+                  disabled={product.stock <= quantity}
+                  onClick={() => addToCart(product)}
+                >
+                  +
+                </button>
                 <button onClick={() => deleteLineFromCart(product)}>
                   Delete
                 </button>
@@ -56,8 +67,12 @@ const CartSidebar = () => {
       </div>
       <div className="sidebar-actions">
         <p>Total : {totalPrice} €</p>
-        <button onClick={() => handleOrder(cart)}>Order</button>
-        <button onClick={deleteCart}>Delete</button>
+        <button disabled={!cart.length} onClick={() => handleOrder(cart)}>
+          Order
+        </button>
+        <button disabled={!cart.length} onClick={deleteCart}>
+          Delete
+        </button>
       </div>
     </div>
   );
