@@ -1,45 +1,62 @@
 import { useEffect, useState } from "react";
 import { OrderDetailsButton, OrderDetailsDialog } from "./OrderDetailsDialog";
+import { useOrders } from "./contexts/order/orders.context";
 
-const Order = () => {
-  const [ordersHistory, setOrdersHistory] = useState([]);
-  const [filteredOrdersHistory, setFilteredOrdersHistory] = useState([]);
-  const [loadingOrdersHistory, setLoadingOrdersHistory] = useState(false);
+const OrdersTable = ({ filteredOrders, setOrderDetails }) => {
+  const { isLoading, isError } = useOrders();
+
+  if (isLoading || isError) {
+    return (
+      <tr>
+        <td colSpan="4">{isLoading ? "Loading..." : "Error"}</td>
+      </tr>
+    );
+  }
+
+  return (
+    <tbody>
+      {filteredOrders.map((order) => {
+        return (
+          <tr key={order.id}>
+            <td>{order.create_at}</td>
+            <td>{order.item_count}</td>
+            <td>{order.total_amount} €</td>
+            <td>
+              <OrderDetailsButton onClick={() => setOrderDetails(order)}>
+                Show Details
+              </OrderDetailsButton>
+            </td>
+          </tr>
+        );
+      })}
+      {!filteredOrders.length && (
+        <tr>
+          <td colSpan="4">No order found</td>
+        </tr>
+      )}
+    </tbody>
+  );
+};
+
+const Orders = () => {
+  const { orders, isLoading } = useOrders();
+  const [filteredOrders, setFilteredOrders] = useState([]);
   const [orderDetails, setOrderDetails] = useState(null);
-  const [orderSearch, setOrderSearch] = useState("");
+  const [ordersSearch, setOrdersSearch] = useState("");
 
   useEffect(() => {
-    fetchOrdersHistory();
-  }, []);
+    let nextOrders = [...orders];
 
-  useEffect(() => {
-    let nextOrders = [...ordersHistory];
-
-    if (orderSearch.trim()) {
-      const normalized = orderSearch.toLowerCase();
+    if (ordersSearch.trim()) {
+      const normalized = ordersSearch.toLowerCase();
       nextOrders = nextOrders.filter((order) => {
         return String(order.create_at || "")
           .toLowerCase()
           .includes(normalized);
       });
     }
-    setFilteredOrdersHistory(nextOrders);
-  }, [ordersHistory, orderSearch]);
-
-  const fetchOrdersHistory = async () => {
-    setLoadingOrdersHistory(true);
-    try {
-      const response = await fetch("/api/orders");
-      const json = await response.json();
-      if (!response.ok) {
-        throw new Error(json.message || "Could not load orders history");
-      }
-      setOrdersHistory(Array.isArray(json) ? json : []);
-    } catch (error) {
-      console.error(error);
-    }
-    setLoadingOrdersHistory(false);
-  };
+    setFilteredOrders(nextOrders);
+  }, [orders, ordersSearch]);
 
   return (
     <>
@@ -53,13 +70,13 @@ const Order = () => {
           <label>
             Search
             <input
-              value={orderSearch}
-              onChange={(event) => setOrderSearch(event.target.value)}
+              value={ordersSearch}
+              onChange={(event) => setOrdersSearch(event.target.value)}
               placeholder="Search date"
             />
           </label>
         </div>
-        <h3>Order History {loadingOrdersHistory ? "(loading...)" : ""}</h3>
+        <h3>Order History {isLoading ? "(loading...)" : ""}</h3>
         <table>
           <thead>
             <tr>
@@ -69,31 +86,14 @@ const Order = () => {
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody>
-            {filteredOrdersHistory.map((order) => {
-              return (
-                <tr key={order.id}>
-                  <td>{order.create_at}</td>
-                  <td>{order.item_count}</td>
-                  <td>{order.total_amount} €</td>
-                  <td>
-                    <OrderDetailsButton onClick={() => setOrderDetails(order)}>
-                      Show Details
-                    </OrderDetailsButton>
-                  </td>
-                </tr>
-              );
-            })}
-            {filteredOrdersHistory.length === 0 ? (
-              <tr>
-                <td colSpan="4">No order found</td>
-              </tr>
-            ) : null}
-          </tbody>
+          <OrdersTable
+            filteredOrders={filteredOrders}
+            setOrderDetails={setOrderDetails}
+          />
         </table>
       </section>
     </>
   );
 };
 
-export default Order;
+export default Orders;
