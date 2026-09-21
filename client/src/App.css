@@ -1,4 +1,6 @@
 .app-page {
+  position: relative;
+  min-height: 100dvh;
   max-width: 1100px;
   margin: 0 auto;
   padding: 16px;
@@ -158,6 +160,64 @@ td {
 
 th {
   background: #eef3fa;
+}
+
+.sidebar {
+  position: fixed;
+  display: grid;
+  grid-template-rows: 0fr 1fr;
+  right: 0;
+  top: 0;
+  padding-left: 8px;
+  padding-right: 8px;
+  border: 1px solid #d4dde8;
+  background-color: #ffffff;
+  min-width: fit-content;
+  height: 100%;
+  width: 40vh;
+}
+
+.sidebar-actions {
+  padding-bottom: 8px;
+}
+
+.cart {
+  overflow-y: scroll;
+  border-top: 1px solid #d4dde8;
+  border-bottom: 1px solid #d4dde8;
+}
+
+.cart-element {
+  border: 1px solid #d4dde8;
+  border-radius: 4px;
+  margin: 8px;
+  padding: 8px;
+}
+
+.cart-actions {
+  display: flex;
+  justify-content: space-evenly;
+  border: 1px solid #d4dde8;
+  border-radius: 4px;
+  padding: 8px;
+}
+
+dialog {
+  position: absolute;
+  inset: 0;
+  background-color: #d4dde8;
+  margin: auto;
+  min-width: fit-content;
+  width: 40vw;
+  height: 50vh;
+  border: 1px solid #24323f;
+  border-radius: 4px;
+  padding: 8px;
+}
+
+.dialog-close {
+  display: flex;
+  flex-direction: row-reverse;
 }
 
 @media (max-width: 800px) {
