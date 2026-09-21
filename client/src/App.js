@@ -790,18 +790,18 @@ function App() {
             </table>
           </section>
         ) : null}
-        {activeTab === "catalog" ? (
+        {activeTab === "catalog" && (
           <CatalogProvider>
             <CartProvider>
               <Catalog />
             </CartProvider>
           </CatalogProvider>
-        ) : null}
-        {activeTab === "order" ? (
+        )}
+        {activeTab === "order" && (
           <OrdersProvider>
             <Orders />
           </OrdersProvider>
-        ) : null}
+        )}
       </main>
     </div>
   );
